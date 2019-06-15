@@ -30,6 +30,19 @@ func TestInsert(t *testing.T) {
 	fmt.Println(r)
 
 }
+func TestInserUSer(t *testing.T) {
+	Mongo()
+	r, err := UserCollection().InsertOne(ctx, &User{
+		ObjectID: primitive.NewObjectID(),
+		UserName: "hongshengjie",
+		PassWord: "123456",
+	})
+	if err != nil {
+		println(err)
+	}
+	fmt.Println(r)
+
+}
 
 var content = `# Colly
 

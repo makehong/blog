@@ -415,5 +415,60 @@ proto.BlogPromiseClient.prototype.update =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.BlogGetTokenReq,
+ *   !proto.BlogGetTokenResp>}
+ */
+const methodInfo_Blog_GetToken = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.BlogGetTokenResp,
+  /** @param {!proto.BlogGetTokenReq} request */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.BlogGetTokenResp.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.BlogGetTokenReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.BlogGetTokenResp)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.BlogGetTokenResp>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.BlogClient.prototype.getToken =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/Blog/GetToken',
+      request,
+      metadata || {},
+      methodInfo_Blog_GetToken,
+      callback);
+};
+
+
+/**
+ * @param {!proto.BlogGetTokenReq} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.BlogGetTokenResp>}
+ *     A native promise that resolves to the response
+ */
+proto.BlogPromiseClient.prototype.getToken =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/Blog/GetToken',
+      request,
+      metadata || {},
+      methodInfo_Blog_GetToken);
+};
+
+
 module.exports = proto;
 

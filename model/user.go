@@ -8,8 +8,9 @@ import (
 // User User
 type User struct {
 	ObjectID primitive.ObjectID `bson:"_id"`
-	UserName string
-	UserFace string
+	UserName string             `bson:"username"`
+	PassWord string             `bson:"password"`
+	Face     string             `bson:"fase"`
 }
 
 // UserCollection 获取集合

@@ -1,7 +1,10 @@
 package blog
 
 import (
+	"blog/service/tool/auth"
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -74,19 +77,19 @@ func (s *Service) Article(ctx context.Context, req *blog.BlogArticleReq) (*blog.
 
 // Add Add
 func (s Service) Add(ctx context.Context, req *blog.BlogAddReq) (*blog.StatusResp, error) {
-	// userID := auth.GetUserIDFromContext(ctx)
-	// if userID == "" {
-	// 	return nil, errors.New("未登陆")
-	// }
-	// userOID, err := primitive.ObjectIDFromHex(userID)
-	// if err != nil {
-	// 	return nil, errors.New("未登陆-oid")
-	// }
+	userID := auth.GetUserIDFromContext(ctx)
+	if userID == "" {
+		return nil, errors.New("未登陆")
+	}
+	userOID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, errors.New("未登陆-oid")
+	}
 
 	var user model.User
-	// if err := model.UserCollection().FindOne(ctx, bson.M{"_id": userOID}).Decode(&user); err != nil {
-	// 	return nil, err
-	// }
+	if err := model.UserCollection().FindOne(ctx, bson.M{"_id": userOID}).Decode(&user); err != nil {
+		return nil, err
+	}
 
 	ar := req.GetArticle()
 	var pcid int32
@@ -102,7 +105,7 @@ func (s Service) Add(ctx context.Context, req *blog.BlogAddReq) (*blog.StatusRes
 		Title:       ar.GetTitle(),
 		HeadImage:   ar.GetHeadImage(),
 		AuthorName:  user.UserName,
-		AuthorFace:  user.UserFace,
+		AuthorFace:  user.Face,
 		ContentHTML: ar.GetContentHTML(),
 		ContentMD:   ar.GetContentMD(),
 		Ctime:       time.Now(),
@@ -117,14 +120,14 @@ func (s Service) Add(ctx context.Context, req *blog.BlogAddReq) (*blog.StatusRes
 
 // Del Del
 func (s Service) Del(ctx context.Context, req *blog.BlogDelReq) (*blog.StatusResp, error) {
-	// userID := auth.GetUserIDFromContext(ctx)
-	// if userID == "" {
-	// 	return &blog.StatusResp{Code: 1, Message: "未登录"}, nil
-	// }
-	// userOID, err := primitive.ObjectIDFromHex(userID)
-	// if err != nil {
-	// 	return nil, errors.New("未登陆-oid")
-	// }
+	userID := auth.GetUserIDFromContext(ctx)
+	if userID == "" {
+		return &blog.StatusResp{Code: 1, Message: "未登录"}, nil
+	}
+	_, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, errors.New("未登陆-oid")
+	}
 
 	oid, err := primitive.ObjectIDFromHex(req.GetObjectID())
 	if err != nil {
@@ -148,10 +151,10 @@ func (s Service) Del(ctx context.Context, req *blog.BlogDelReq) (*blog.StatusRes
 // Update Update
 func (s Service) Update(ctx context.Context, req *blog.BlogUpdateReq) (*blog.StatusResp, error) {
 
-	// userID := auth.GetUserIDFromContext(ctx)
-	// if userID == "" {
-	// 	return &blog.StatusResp{Code: 1, Message: "未登录"}, nil
-	// }
+	userID := auth.GetUserIDFromContext(ctx)
+	if userID == "" {
+		return &blog.StatusResp{Code: 1, Message: "未登录"}, nil
+	}
 
 	oid, err := primitive.ObjectIDFromHex(req.GetObjectID())
 	if err != nil {
@@ -206,6 +209,24 @@ func (s Service) Update(ctx context.Context, req *blog.BlogUpdateReq) (*blog.Sta
 	}
 
 	return &blog.StatusResp{}, nil
+}
+
+// GetToken GetToken
+func (s *Service) GetToken(ctx context.Context, req *blog.BlogGetTokenReq) (*blog.BlogGetTokenResp, error) {
+	var user model.User
+	if err := model.UserCollection().FindOne(ctx, bson.M{"username": req.GetUsername()}).Decode(&user); err != nil {
+		return nil, err
+	}
+	if user.PassWord != req.GetPassword() {
+		return nil, errors.New("密码错误")
+	}
+	t, err := auth.NewToken(user.UserName)
+	fmt.Println(t)
+	if err != nil {
+		return nil, err
+	}
+	return &blog.BlogGetTokenResp{Token: t}, nil
+
 }
 
 func modelToProto(a *model.Article) *blog.BlogArticle {

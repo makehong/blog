@@ -4,6 +4,7 @@ service Blog {
     // 首页
     rpc Index(BlogIndexReq)returns (BlogIndexResp);
 
+    
     // 文章详情页
     rpc Article(BlogArticleReq)returns(BlogArticleResp);
     // 文章列表页
@@ -14,8 +15,20 @@ service Blog {
     rpc Del(BlogDelReq)returns(StatusResp);
     // 更新文章
     rpc Update(BlogUpdateReq)returns (StatusResp);
+
+
+    // 登陆获取token,退出的时候把浏览器的token删除就好
+    rpc GetToken(BlogGetTokenReq)returns (BlogGetTokenResp);
  }
 
+message BlogGetTokenReq{
+    string username = 1;
+    string password = 2;
+}
+
+message BlogGetTokenResp{
+    string token  = 1;
+}
 message BlogIndexReq{}
 
 message BlogIndexResp{
