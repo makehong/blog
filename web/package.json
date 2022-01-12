@@ -11,7 +11,7 @@
     "core-js": "^2.6.5",
     "google-protobuf": "^3.8.0-rc.1",
     "grpc-web": "^1.0.4",
-    "markdown-it": "^8.4.2",
+    "markdown-it": "^12.3.2",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3"
   },
